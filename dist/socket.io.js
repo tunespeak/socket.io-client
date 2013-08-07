@@ -2371,6 +2371,13 @@ var io = ('undefined' === typeof module ? {} : module.exports);
       Socket = global.MozWebSocket || global.WebSocket;
     }
 
+    if (this.websocket) {
+      this.websocket.onopen = null;
+      this.websocket.onmessage = null;
+      this.websocket.onclose = null;
+      this.websocket.onerror = null;
+    }
+
     this.websocket = new Socket(this.prepareUrl() + query);
 
     this.websocket.onopen = function () {
@@ -2399,8 +2406,8 @@ var io = ('undefined' === typeof module ? {} : module.exports);
    * @api public
    */
 
-  // Do to a bug in the current IDevices browser, we need to wrap the send in a 
-  // setTimeout, when they resume from sleeping the browser will crash if 
+  // Do to a bug in the current IDevices browser, we need to wrap the send in a
+  // setTimeout, when they resume from sleeping the browser will crash if
   // we don't allow the browser time to detect the socket has been closed
   if (io.util.ua.iDevice) {
     WS.prototype.send = function (data) {
