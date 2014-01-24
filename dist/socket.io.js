@@ -2380,6 +2380,12 @@ var io = ('undefined' === typeof module ? {} : module.exports);
       self.socket.setBuffer(false);
     };
     this.websocket.onmessage = function (ev) {
+      // Hacky way of fixing an issue where the onclose is forcing the new socket to
+      // dump messages into the buffer. If we are receiving messages then we are connected
+      // and we shouldn't be putting messages in the buffer
+      if (self.socket.doBuffer) {
+        self.socket.setBuffer(false);
+      }
       self.onData(ev.data);
     };
     this.websocket.onclose = function () {
@@ -2401,8 +2407,8 @@ var io = ('undefined' === typeof module ? {} : module.exports);
    * @api public
    */
 
-  // Do to a bug in the current IDevices browser, we need to wrap the send in a 
-  // setTimeout, when they resume from sleeping the browser will crash if 
+  // Do to a bug in the current IDevices browser, we need to wrap the send in a
+  // setTimeout, when they resume from sleeping the browser will crash if
   // we don't allow the browser time to detect the socket has been closed
   if (io.util.ua.iDevice) {
     WS.prototype.send = function (data) {
